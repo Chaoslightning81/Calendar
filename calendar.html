@@ -29,7 +29,7 @@
       throw new Error("No client specified.");
     }
 
-    document.getElementById("clientHeader").innerText = `Events for ${client.toUpperCase()}`;
+    document.getElementById("clientHeader").innerText = `Milestones for ${client.toUpperCase()}`;
 
     // 🔁 Cache-busting parameter added using Date.now()
     const dataUrl = `data/${client}.json?nocache=${Date.now()}`;
