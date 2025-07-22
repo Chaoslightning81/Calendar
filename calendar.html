@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Client Calendar</title>
+</head>
+<body>
+  <h1 id="clientHeader">Loading...</h1>
+  <ul id="eventList"></ul>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const client = params.get("client");
+    const display = document.getElementById("clientHeader");
+    const list = document.getElementById("eventList");
+
+    display.innerText = `Events for ${client.toUpperCase()}`;
+
+    fetch(`data/${client}.json`)
+      .then(res => res.json())
+      .then(data => {
+        data.forEach(event => {
+          const li = document.createElement("li");
+          li.textContent = `${event.Event} on ${new Date(event["Start Date"]).toDateString()} at ${event.Location}`;
+          list.appendChild(li);
+        });
+      })
+      .catch(() => {
+        list.innerHTML = `<li>No events found for ${client}</li>`;
+      });
+  </script>
+</body>
+</html>
