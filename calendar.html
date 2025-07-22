@@ -1,32 +1,65 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Client Calendar</title>
+  <link href="https://cdn.jsdelivr.net/npm/@fullcalendar/core@3.2.0/main.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@3.2.0/main.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      margin: 20px;
+    }
+    #calendar {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+  </style>
 </head>
 <body>
-  <h1 id="clientHeader">Loading...</h1>
-  <ul id="eventList"></ul>
+  <h1 id="clientHeader">Loading client calendar...</h1>
+  <div id="calendar"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@3.2.0/main.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@3.2.0/main.js"></script>
 
   <script>
     const params = new URLSearchParams(window.location.search);
     const client = params.get("client");
-    const display = document.getElementById("clientHeader");
-    const list = document.getElementById("eventList");
 
-    display.innerText = `Events for ${client.toUpperCase()}`;
+    if (!client) {
+      document.getElementById("clientHeader").innerText = "No client specified in the URL.";
+    } else {
+      const clientName = client.toUpperCase();
+      document.getElementById("clientHeader").innerText = `Events for ${clientName}`;
 
-    fetch(`data/${client}.json`)
-      .then(res => res.json())
-      .then(data => {
-        data.forEach(event => {
-          const li = document.createElement("li");
-          li.textContent = `${event.Event} on ${new Date(event["Start Date"]).toDateString()} at ${event.Location}`;
-          list.appendChild(li);
+      fetch(`data/${client}.json`)
+        .then(res => res.json())
+        .then(data => {
+          const events = data.map(event => ({
+            title: event.Event,
+            start: event["Start Date"],
+            end: event["End Date"],
+            location: event.Location
+          }));
+
+          // Initialize FullCalendar
+          new FullCalendar.Calendar(document.getElementById('calendar'), {
+            plugins: ['dayGrid'],
+            initialView: 'dayGridMonth',
+            events: events,
+            eventClick: function(info) {
+              alert(`Event: ${info.event.title}\nLocation: ${info.event.extendedProps.location}`);
+            }
+          }).render();
+        })
+        .catch(() => {
+          document.getElementById("calendar").innerHTML = "<p>Could not load events for this client.</p>";
         });
-      })
-      .catch(() => {
-        list.innerHTML = `<li>No events found for ${client}</li>`;
-      });
+    }
   </script>
 </body>
 </html>
+
