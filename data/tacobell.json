@@ -5,5 +5,12 @@
     "End Date": "2025-07-25T04:00:00.000Z",
     "Client": "TACOBELL",
     "Location": ""
+  },
+  {
+    "Event": "follow up meeting",
+    "Start Date": "2025-07-29T04:00:00.000Z",
+    "End Date": "2025-07-30T04:00:00.000Z",
+    "Client": "TACOBELL",
+    "Location": ""
   }
 ]
