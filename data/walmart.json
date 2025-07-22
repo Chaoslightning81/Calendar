@@ -5,5 +5,19 @@
     "End Date": "2025-07-29T04:00:00.000Z",
     "Client": "WALMART",
     "Location": ""
+  },
+  {
+    "Event": "conference call",
+    "Start Date": "2025-07-31T04:00:00.000Z",
+    "End Date": "2025-08-01T04:00:00.000Z",
+    "Client": "WALMART",
+    "Location": ""
+  },
+  {
+    "Event": "Playbook",
+    "Start Date": "2025-08-01T04:00:00.000Z",
+    "End Date": "2025-08-02T04:00:00.000Z",
+    "Client": "WALMART",
+    "Location": ""
   }
 ]
