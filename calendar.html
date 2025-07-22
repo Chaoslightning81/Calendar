@@ -1,66 +1,72 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Client Calendar</title>
-    <!-- FullCalendar CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/@fullcalendar/core@3.10.2/main.min.css" rel="stylesheet">
-    <!-- FullCalendar JS -->
-    <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@3.10.2/main.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Client Calendar</title>
+
+  <!-- FullCalendar v6 CSS & JS -->
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 20px;
+    }
+    #calendar {
+      max-width: 900px;
+      margin: 40px auto;
+    }
+  </style>
 </head>
 <body>
-    <h1 id="clientHeader">Loading...</h1>
-    <!-- Calendar container -->
-    <div id="calendar"></div>
+  <h1 id="clientHeader">Loading...</h1>
+  <div id="calendar"></div>
 
-    <script>
-        // Get the client from the URL parameter
-        const params = new URLSearchParams(window.location.search);
-        const client = params.get("client"); // Extract client name from the query string
-        const display = document.getElementById("clientHeader");
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const client = params.get("client");
 
-        // Set the page title dynamically
-        display.innerText = `Events for ${client.toUpperCase()}`;
+    if (!client) {
+      document.getElementById("clientHeader").innerText = "Client not specified.";
+      document.getElementById("calendar").innerHTML = "<p>Please specify a client in the URL.</p>";
+    } else {
+      const display = document.getElementById("clientHeader");
+      display.innerText = `Events for ${client.toUpperCase()}`;
 
-        // Fetch the events for the client
-        fetch(`data/${client}.json`)
-            .then(res => res.json())  // Parse the JSON data
-            .then(data => {
-                // If there are no events, display a message
-                if (data.length === 0) {
-                    document.getElementById("calendar").innerHTML = "<p>No events found for this client.</p>";
-                    return;
-                }
+      fetch(`../data/${client}.json`)  // Adjusted path
+        .then((res) => {
+          if (!res.ok) throw new Error("JSON file not found.");
+          return res.json();
+        })
+        .then((data) => {
+          const events = data.map(event => ({
+            title: event.Event,
+            start: event["Start Date"],
+            end: event["End Date"],
+            extendedProps: {
+              location: event.Location || ""
+            }
+          }));
 
-                // Map the events into the format FullCalendar expects
-                const events = data.map(event => ({
-                    title: event.Event,
-                    start: event["Start Date"],  // Start date of the event
-                    end: event["End Date"],      // End date of the event
-                    location: event.Location     // Event location
-                }));
+          const calendar = new FullCalendar.Calendar(document.getElementById("calendar"), {
+            initialView: "dayGridMonth",
+            height: "auto",
+            events: events,
+            eventClick: function(info) {
+              alert(`Event: ${info.event.title}\nLocation: ${info.event.extendedProps.location}`);
+            }
+          });
 
-                // Initialize FullCalendar
-                const calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
-                    plugins: ['dayGrid'],  // Use the dayGrid plugin for the calendar view
-                    initialView: 'dayGridMonth',  // Default view is the month view
-                    events: events,  // Provide the events to the calendar
-                    eventClick: function(info) {
-                        // Show an alert with the event details when clicked
-                        alert(`Event: ${info.event.title}\nLocation: ${info.event.extendedProps.location}`);
-                    }
-                });
-
-                // Render the calendar
-                calendar.render();
-            })
-            .catch(error => {
-                // Handle any errors (e.g., network issues)
-                console.error("Error loading events:", error);
-                document.getElementById("calendar").innerHTML = "<p>Could not load events for this client.</p>";
-            });
-    </script>
+          calendar.render();
+        })
+        .catch((err) => {
+          console.error(err);
+          document.getElementById("calendar").innerHTML = `<p>Could not load events: ${err.message}</p>`;
+        });
+    }
+  </script>
 </body>
 </html>
 
