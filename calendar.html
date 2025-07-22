@@ -30,12 +30,13 @@
 
     if (!client) {
       document.getElementById("clientHeader").innerText = "Client not specified.";
-      document.getElementById("calendar").innerHTML = "<p>Please specify a client in the URL.</p>";
+      document.getElementById("calendar").innerHTML = "<p>Please specify a client in the URL (e.g. ?client=wendys).</p>";
     } else {
       const display = document.getElementById("clientHeader");
       display.innerText = `Events for ${client.toUpperCase()}`;
 
-      fetch(`../data/${client}.json`)  // Adjusted path
+      // ✅ Path fixed for root-level calendar.html
+      fetch(`data/${client}.json`)
         .then((res) => {
           if (!res.ok) throw new Error("JSON file not found.");
           return res.json();
@@ -69,5 +70,4 @@
   </script>
 </body>
 </html>
-
 
